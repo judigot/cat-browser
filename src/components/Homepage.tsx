@@ -1,6 +1,6 @@
 import React from "react";
 
-import Container from "react-bootstrap/Container";
+import { useSearchParams } from "react-router-dom";
 
 import Breeds from "../helpers/getBreeds";
 
@@ -9,18 +9,21 @@ import Cats from "../helpers/getCats";
 const breeds: Breed[] = await Breeds();
 
 export default function App() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const breedParam = searchParams.get("breed");
+
   const [cats, setCats] = React.useState<Cat[]>();
 
   const [catIds, setCatIds] = React.useState<string[]>();
 
   const [page, setPage] = React.useState<number>(1);
 
-  const [breed, setBreed] = React.useState<string>();
+  const [breed, setBreed] = React.useState<string>(breedParam || "");
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  const [isReachedMaxCats, setIsReachedMaxCats] =
-    React.useState<boolean>(false);
+  const [isNoResult, setIsNoResult] = React.useState<boolean>(false);
 
   const loadCats = async () => {
     let newCatsResult: Cat[] = await Cats({
@@ -31,51 +34,61 @@ export default function App() {
     let tempCats: Cat[] = [];
     const ids: string[] = [];
 
-    // Initial cats
-    if (!cats) {
-      tempCats = structuredClone(newCatsResult);
-    }
-
-    // Push new cats
-    if (cats && catIds) {
-      tempCats = structuredClone(cats);
-
-      // Filter existing cats
-      const newCats = newCatsResult.filter(
-        (cat: Cat) => !catIds.includes(cat.id)
-      );
-
-      if (newCats.length) {
-        tempCats.push(...newCats.values());
+    if (newCatsResult.length) {
+      // Initial cats
+      if (!cats) {
+        tempCats = structuredClone(newCatsResult);
       }
 
-      if (!newCats.length) {
-        // Hide "Load more" button
-        setIsReachedMaxCats(true);
+      // Push new cats
+      if (cats && catIds) {
+        tempCats = structuredClone(cats);
+
+        // Filter existing cats
+        const newCats = newCatsResult.filter(
+          (cat: Cat) => !catIds.includes(cat.id)
+        );
+
+        if (newCats.length) {
+          tempCats.push(...newCats.values());
+        }
+
+        if (!newCats.length) {
+          // Hide "Load more" button
+          setIsNoResult(true);
+        }
       }
+
+      // Get cats' ids
+      tempCats.map((cat) => {
+        ids.push(cat.id);
+      });
+
+      setCatIds(ids);
+      setCats(tempCats);
+      setIsLoading(false);
     }
 
-    // Get cats' ids
-    tempCats.map((cat) => {
-      ids.push(cat.id);
-    });
-
-    setCatIds(ids);
-    setCats(tempCats);
-    setIsLoading(false);
+    if (!newCatsResult.length) {
+      setIsNoResult(true);
+    }
   };
 
   const clearPreviousCats = () => {
     setPage(1);
     setCats([]);
     setCatIds([]);
-    setIsReachedMaxCats(false);
+    setIsNoResult(false);
     return true;
   };
 
   React.useEffect(() => {
     if (page && breed) {
+      setIsLoading(true);
       loadCats();
+    }
+    if (!breed) {
+      setCats([]);
     }
   }, [breed, page]);
 
@@ -89,12 +102,12 @@ export default function App() {
               Breed
             </label>
             <select
+              value={breed}
               id="breed"
               className="form-control"
               onChange={(e) => {
                 if (clearPreviousCats()) {
                   const selectedBreed = e.target.value;
-                  setIsLoading(true);
                   setBreed(selectedBreed);
                 }
               }}
@@ -128,18 +141,18 @@ export default function App() {
           );
         })}
 
-        {!cats && (
+        {!cats?.length && (
           <div className="col-12" style={{ marginBottom: "20px" }}>
             No cats available
           </div>
         )}
       </div>
-      {!isReachedMaxCats && (
+      {!isNoResult && (
         <div className="row">
           <div className="col-md-3 col-sm-6 col-12">
             <button
               disabled={(() => {
-                if (!cats) return true;
+                if (!cats?.length) return true;
                 if (isLoading) return true;
 
                 return false;
