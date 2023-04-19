@@ -1,4 +1,6 @@
-export default async ({ breedID, page }: { breedID: string; page: number }) => {
+export default async ({ breedID, page }: { breedID: string | undefined; page: number }) => {
+  let data;
+
   try {
     const response = await fetch(
       // `https://api.thecatapi.com/v1/images/search?page=1&limit=10&breed_id=abys`,
@@ -15,7 +17,7 @@ export default async ({ breedID, page }: { breedID: string; page: number }) => {
       }
     );
     if (response?.ok) {
-      return response.json();
+      data = response.json();
     } else {
       throw new Error(`HTTP error: ${response}`);
     }
@@ -31,5 +33,10 @@ export default async ({ breedID, page }: { breedID: string; page: number }) => {
       throw new Error(`Syntax Error: ${error}`);
     }
   } finally {
+  }
+
+  // Success
+  if (data) {
+    return data;
   }
 };

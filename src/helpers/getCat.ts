@@ -1,4 +1,6 @@
 export default async ({ catID }: { catID: string }) => {
+  let data;
+
   try {
     const response = await fetch(
       // `https://api.thecatapi.com/v1/images/EHG3sOpAM`,
@@ -15,7 +17,7 @@ export default async ({ catID }: { catID: string }) => {
       }
     );
     if (response?.ok) {
-      return response.json();
+      data = response.json();
     } else {
       throw new Error(`HTTP error: ${response}`);
     }
@@ -31,5 +33,10 @@ export default async ({ catID }: { catID: string }) => {
       throw new Error(`Syntax Error: ${error}`);
     }
   } finally {
+  }
+
+  // Success
+  if (data) {
+    return data;
   }
 };
