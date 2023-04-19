@@ -19,18 +19,18 @@ export default async ({ catID }: { catID: string }) => {
     if (response?.ok) {
       data = response.json();
     } else {
-      throw new Error(`HTTP error: ${response}`);
+      alert(`Hairball Error\n\nApologies but we could not load the cat information for you.`);
     }
   } catch (error: unknown) {
     if (typeof error === `string`) {
-      throw new Error(`There was an error: ${error}`);
+      alert(`Hairball Error\n\nApologies but we could not load the cat information for you.`);
     }
     if (error instanceof Error) {
-      throw new Error(`There was an error: ${error.message}`);
+      alert(`Hairball Error\n\nApologies but we could not load the cat information for you.`);
     }
     if (error instanceof SyntaxError) {
       // Unexpected token < in JSON
-      throw new Error(`Syntax Error: ${error}`);
+      alert(`Hairball Error\n\nApologies but we could not load the cat information for you.`);
     }
   } finally {
   }

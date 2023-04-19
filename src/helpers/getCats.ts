@@ -1,4 +1,10 @@
-export default async ({ breedID, page }: { breedID: string | undefined; page: number }) => {
+export default async ({
+  breedID,
+  page,
+}: {
+  breedID: string | undefined;
+  page: number;
+}) => {
   let data;
 
   try {
@@ -19,18 +25,26 @@ export default async ({ breedID, page }: { breedID: string | undefined; page: nu
     if (response?.ok) {
       data = response.json();
     } else {
-      throw new Error(`HTTP error: ${response}`);
+      alert(
+        `Hairball Error\n\nApologies but we could not load new cats for you at this time! Miau!`
+      );
     }
   } catch (error: unknown) {
     if (typeof error === `string`) {
-      throw new Error(`There was an error: ${error}`);
+      alert(
+        `Hairball Error\n\nApologies but we could not load new cats for you at this time! Miau!`
+      );
     }
     if (error instanceof Error) {
-      throw new Error(`There was an error: ${error.message}`);
+      alert(
+        `Hairball Error\n\nApologies but we could not load new cats for you at this time! Miau!`
+      );
     }
     if (error instanceof SyntaxError) {
       // Unexpected token < in JSON
-      throw new Error(`Syntax Error: ${error}`);
+      alert(
+        `Hairball Error\n\nApologies but we could not load new cats for you at this time! Miau!`
+      );
     }
   } finally {
   }

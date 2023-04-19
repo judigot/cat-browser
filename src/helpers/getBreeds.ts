@@ -15,18 +15,26 @@ export default async () => {
     if (response?.ok) {
       data = response.json();
     } else {
-      throw new Error(`HTTP error: ${response}`);
+      alert(
+        `Hairball Error\n\nWe could not load the cat breeds for some reason. Maybe some other time?`
+      );
     }
   } catch (error: unknown) {
     if (typeof error === `string`) {
-      throw new Error(`There was an error: ${error}`);
+      alert(
+        `Hairball Error\n\nWe could not load the cat breeds for some reason. Maybe some other time?`
+      );
     }
     if (error instanceof Error) {
-      throw new Error(`There was an error: ${error.message}`);
+      alert(
+        `Hairball Error\n\nWe could not load the cat breeds for some reason. Maybe some other time?`
+      );
     }
     if (error instanceof SyntaxError) {
       // Unexpected token < in JSON
-      throw new Error(`Syntax Error: ${error}`);
+      alert(
+        `Hairball Error\n\nWe could not load the cat breeds for some reason. Maybe some other time?`
+      );
     }
   } finally {
   }
