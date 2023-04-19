@@ -34,7 +34,7 @@ export default function App() {
 
   const [catIds, setCatIds] = React.useState<string[]>();
 
-  const [page, setPage] = React.useState<number>(0);
+  const [page, setPage] = React.useState<number>(1);
 
   const [breed, setBreed] = React.useState<string>();
 
@@ -86,6 +86,14 @@ export default function App() {
     setIsLoading(false);
   };
 
+  const clearPreviousCats = () => {
+    setPage(1);
+    setCats([]);
+    setCatIds([]);
+    setIsReachedMaxCats(false);
+    return true;
+  };
+
   React.useEffect(() => {
     if (page && breed) {
       loadCats();
@@ -106,10 +114,11 @@ export default function App() {
                 id="breed"
                 className="form-control"
                 onChange={(e) => {
-                  const selectedBreed = e.target.value;
-                  setIsLoading(true);
-                  setPage(page ? page + 1 : 1);
-                  setBreed(selectedBreed);
+                  if (clearPreviousCats()) {
+                    const selectedBreed = e.target.value;
+                    setIsLoading(true);
+                    setBreed(selectedBreed);
+                  }
                 }}
               >
                 <option value="">Select breed</option>
@@ -154,12 +163,17 @@ export default function App() {
           <div className="row">
             <div className="col-md-3 col-sm-6 col-12">
               <button
-                disabled={!cats ? true : false}
+                disabled={(() => {
+                  if (!cats) return true;
+                  if (isLoading) return true;
+
+                  return false;
+                })()}
                 type="button"
                 className="btn btn-success"
                 onClick={() => {
                   setIsLoading(true);
-                  setPage(page ? page + 1 : 1);
+                  setPage(page + 1);
                 }}
               >
                 {isLoading ? "Loading cats..." : "Load more"}
