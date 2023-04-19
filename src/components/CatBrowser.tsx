@@ -31,7 +31,8 @@ const breeds: Breed[] = await Breeds();
 
 export default function App() {
   const [cats, setCats] = React.useState<Cat[]>();
-  const [cat, setCat] = React.useState<CatInfo>();
+
+  const [catIds, setCatIds] = React.useState<string[]>();
 
   const [page, setPage] = React.useState<number>(0);
 
@@ -39,26 +40,44 @@ export default function App() {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
+  const loadCats = async () => {
+    let newCats: Cat[] = await Cats({
+      breedID: breed,
+      page,
+    });
+
+    let tempCats: Cat[] = [];
+    const ids: string[] = [];
+
+    // Initial cats
+    if (!cats) {
+      tempCats = structuredClone(newCats);
+    }
+
+    // Push new cats
+    if (cats && catIds) {
+      tempCats = structuredClone(cats);
+
+      // Filter existing cats
+      tempCats.push(
+        ...newCats.filter((cat: Cat) => !catIds.includes(cat.id)).values()
+      );
+    }
+
+    // Get cats' ids
+    tempCats.map((cat) => {
+      ids.push(cat.id);
+    });
+
+    setCatIds(ids);
+    setCats(tempCats);
+    setIsLoading(false);
+  };
+
   React.useEffect(() => {
-    if (page && breed)
-      (async () => {
-        let newCats: Cat[] = await Cats({
-          breedID: breed,
-          page,
-        });
-
-        // Filter existing cats
-        // newCats.filter((cat: Cat[]) => {
-
-        // });
-
-        const tempCats: Cat[] = structuredClone(cats ? cats : newCats);
-
-        cats ? tempCats.push(...newCats) : false;
-
-        setCats(tempCats);
-        setIsLoading(false);
-      })();
+    if (page && breed) {
+      loadCats();
+    }
   }, [breed, page]);
 
   return (
@@ -93,6 +112,7 @@ export default function App() {
             </div>
           </div>
         </div>
+
         <div className="row">
           {cats?.map((row, i: number, array: object[]) => {
             return (
@@ -125,6 +145,8 @@ export default function App() {
               type="button"
               className="btn btn-success"
               onClick={() => {
+                setIsLoading(true);
+                setPage(page ? page + 1 : 1);
               }}
             >
               {isLoading ? "Loading cats..." : "Load more"}
