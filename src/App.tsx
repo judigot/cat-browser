@@ -1,14 +1,14 @@
-import React from "react";
+import Container from "react-bootstrap/Container";
 
 import {
   Navigate,
   createBrowserRouter,
   RouterProvider,
-  useParams,
 } from "react-router-dom";
 
-import CatBrowser from "./components/CatBrowser";
-import CatInfo from "./components/CatInfo";
+import CatBrowser from "./components/Homepage";
+
+import CatInfo from "./components/SingleCatPage";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -26,5 +26,11 @@ export default function App() {
     },
   ]);
 
-  return <RouterProvider router={router} fallbackElement={<>Loading...</>} />;
+  return (
+    <div style={{ padding: "2rem" }}>
+      <Container>
+        <RouterProvider router={router} fallbackElement={<>Loading...</>} />
+      </Container>
+    </div>
+  );
 }
