@@ -40,8 +40,11 @@ export default function App() {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
+  const [isReachedMaxCats, setIsReachedMaxCats] =
+    React.useState<boolean>(false);
+
   const loadCats = async () => {
-    let newCats: Cat[] = await Cats({
+    let newCatsResult: Cat[] = await Cats({
       breedID: breed,
       page,
     });
@@ -51,7 +54,7 @@ export default function App() {
 
     // Initial cats
     if (!cats) {
-      tempCats = structuredClone(newCats);
+      tempCats = structuredClone(newCatsResult);
     }
 
     // Push new cats
@@ -59,9 +62,18 @@ export default function App() {
       tempCats = structuredClone(cats);
 
       // Filter existing cats
-      tempCats.push(
-        ...newCats.filter((cat: Cat) => !catIds.includes(cat.id)).values()
+      const newCats = newCatsResult.filter(
+        (cat: Cat) => !catIds.includes(cat.id)
       );
+
+      if (newCats.length) {
+        tempCats.push(...newCats.values());
+      }
+
+      if (!newCats.length) {
+        // Hide "Load more" button
+        setIsReachedMaxCats(true);
+      }
     }
 
     // Get cats' ids
@@ -138,21 +150,23 @@ export default function App() {
             </div>
           )}
         </div>
-        <div className="row">
-          <div className="col-md-3 col-sm-6 col-12">
-            <button
-              disabled={!cats ? true : false}
-              type="button"
-              className="btn btn-success"
-              onClick={() => {
-                setIsLoading(true);
-                setPage(page ? page + 1 : 1);
-              }}
-            >
-              {isLoading ? "Loading cats..." : "Load more"}
-            </button>
+        {!isReachedMaxCats && (
+          <div className="row">
+            <div className="col-md-3 col-sm-6 col-12">
+              <button
+                disabled={!cats ? true : false}
+                type="button"
+                className="btn btn-success"
+                onClick={() => {
+                  setIsLoading(true);
+                  setPage(page ? page + 1 : 1);
+                }}
+              >
+                {isLoading ? "Loading cats..." : "Load more"}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </Container>
     </div>
   );
