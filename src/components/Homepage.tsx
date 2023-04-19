@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import Breeds from "../helpers/getBreeds";
 
@@ -132,9 +132,10 @@ export default function App() {
               <div className="card">
                 <img className="card-img-top" src={row.url} />
                 <div className="card-body">
-                  <a className="btn btn-primary btn-block" href={`/${row.id}`}>
+                  <Link to={`/${row.id}`} className="btn btn-primary btn-block">
                     View details
-                  </a>
+                    {/* </a> */}
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import getCat from "../helpers/getCat";
 
@@ -9,12 +9,14 @@ export default function CatInfo() {
 
   const [catInfo, setCatInfo] = React.useState<CatInfo>();
 
-  (async () => {
-    if (catID) {
-      const catInfoResult = await getCat({ catID });
-      setCatInfo(catInfoResult);
-    }
-  })();
+  React.useEffect(() => {
+    (async () => {
+      if (catID) {
+        const catInfoResult = await getCat({ catID });
+        setCatInfo(catInfoResult);
+      }
+    })();
+  }, []);
 
   return (
     <>
@@ -22,12 +24,12 @@ export default function CatInfo() {
         <div className="container">
           <div className="card">
             <div className="card-header">
-              <a
+              <Link
+                to={`/?breed=${catInfo.breeds[0].id}`}
                 className="btn btn-primary"
-                href={`/?breed=${catInfo.breeds[0].id}`}
               >
                 Back
-              </a>
+              </Link>
             </div>
             <img className="card-img" src={catInfo.url} />
             <div className="card-body">
