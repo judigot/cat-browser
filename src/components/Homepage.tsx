@@ -6,12 +6,12 @@ import Breeds from "../helpers/getBreeds";
 
 import Cats from "../helpers/getCats";
 
-const breeds: Breed[] = await Breeds();
-
 export default function App() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const breedParam = searchParams.get("breed");
+
+  const [breeds, setBreeds] = React.useState<Breed[]>();
 
   const [cats, setCats] = React.useState<Cat[]>();
 
@@ -24,6 +24,23 @@ export default function App() {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const [isNoResult, setIsNoResult] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    (async () => {
+      const breeds: Breed[] = await Breeds();
+      setBreeds(breeds);
+    })();
+  }, []);
+
+  React.useEffect(() => {
+    if (page && breed) {
+      setIsLoading(true);
+      loadCats();
+    }
+    if (!breed) {
+      setCats([]);
+    }
+  }, [breed, page]);
 
   const loadCats = async () => {
     let newCatsResult: Cat[] = await Cats({
@@ -82,19 +99,8 @@ export default function App() {
     return true;
   };
 
-  React.useEffect(() => {
-    if (page && breed) {
-      setIsLoading(true);
-      loadCats();
-    }
-    if (!breed) {
-      setCats([]);
-    }
-  }, [breed, page]);
-
   return (
     <>
-      <h1>Cat Browser</h1>
       <div className="row" style={{ padding: "10px 0px" }}>
         <div className="col-md-3 col-sm-6 col-12">
           <div className="form-group">
@@ -106,10 +112,9 @@ export default function App() {
               id="breed"
               className="form-control"
               onChange={(e) => {
-                if (clearPreviousCats()) {
-                  const selectedBreed = e.target.value;
-                  setBreed(selectedBreed);
-                }
+                clearPreviousCats();
+                const selectedBreed = e.target.value;
+                setBreed(selectedBreed);
               }}
             >
               <option value="">Select breed</option>

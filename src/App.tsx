@@ -29,6 +29,7 @@ export default function App() {
   return (
     <div style={{ padding: "2rem" }}>
       <Container>
+        <h1>🐱Cat Browser</h1>
         <RouterProvider router={router} fallbackElement={<>Loading...</>} />
       </Container>
     </div>
